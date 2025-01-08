@@ -31,8 +31,8 @@ inputList: list[str] = list(inputPath.glob('**/*.[jp][pn]g'))
 styleList: list[str] = list(stylePath.glob('**/*.[jp][pn]g'))
 
 # Loading the original and the style image
-contentImage = loadImage(inputList[6], device)
-styleImage = loadImage(styleList[1], device)
+contentImage = loadImage(inputList[2], device)
+styleImage = loadImage(styleList[2], device)
 outputImage = contentImage.clone().requires_grad_(True)
 
 def neuralTransfer():
@@ -40,14 +40,16 @@ def neuralTransfer():
     iterations = 1000
     # learning rate, how similar the content and style should be. 
     # higher = more style, lower = more content
-    lr = 0.05
+    lr = 0.1
     alpha = 8
     beta = 70
     convLayers = [0, 2, 5, 7, 10, 14, 16, 19, 21, 23, 25, 28]
     
     # Load the model to the GPU
     model = VGG().to(device).eval()
-    optimizer = optim.Adam([outputImage], lr=lr)
+    #optimizer = optim.Adam([outputImage], lr=lr)
+    
+    optimizer = optim.LBFGS([outputImage], lr=lr, max_iter=1)
     
     # Iterating for 1000 times
     for e in range(iterations):
@@ -61,10 +63,21 @@ def neuralTransfer():
 
         print(f"I: {e} Loss: {totalLoss}")
         
+        
+        def closure():
+            return totalLoss
+        
         # Optimize the image + back propogation
         optimizer.zero_grad()
         totalLoss.backward()
-        optimizer.step()
+        
+        
+        
+        
+        
+        optimizer.step(closure)
+        
+        
         
         
         # Extract feature maps
