@@ -31,8 +31,8 @@ inputList: list[str] = list(inputPath.glob('**/*.[jp][pn]g'))
 styleList: list[str] = list(stylePath.glob('**/*.[jp][pn]g'))
 
 # Loading the original and the style image
-contentImage = loadImage(inputList[6], device)
-styleImage = loadImage(styleList[1], device)
+contentImage = loadImage(inputList[2], device)
+styleImage = loadImage(styleList[2], device)
 outputImage = contentImage.clone().requires_grad_(True)
 
 def neuralTransfer():
