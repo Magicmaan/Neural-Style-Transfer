@@ -9,6 +9,9 @@ from torchvision import models
 from Utils import VGG, loadImage, getTotalLoss, extractFeatures
 import tkinter as tk
 from tkinter import filedialog
+import threading
+import os
+import subprocess
 
 # Load VGG19 model
 model = models.vgg19(models.VGG19_Weights.DEFAULT).features
@@ -35,7 +38,7 @@ contentImage = loadImage(inputList[2], device)
 styleImage = loadImage(styleList[2], device)
 outputImage = contentImage.clone().requires_grad_(True)
 
-def neuralTransfer():
+def neuralTransfer(contentImage, styleImage, outputImage):
     # Model hyperparameters
     iterations = 1000
     # learning rate, how similar the content and style should be. 
@@ -78,11 +81,15 @@ def neuralTransfer():
                 a.axis("off")
                 a.set_title(f"Layer {convLayers[i]}")
             plt.savefig(outputPath.joinpath("feature_map.png"), bbox_inches='tight')
+            save_image(outputImage, outputPath.joinpath("gen_latest.png"))
         
         # occassionally save the image
         if e % 50 == 0:
             print("Saving Image")
             save_image(outputImage, outputPath.joinpath(f"gen_{e}.png"))
+            
+            # save as latest image
+            save_image(outputImage, outputPath.joinpath("gen_latest.png"))
 
 def loadImageToLabel(entry, canvas, callback):
     image_path = filedialog.askopenfilename()
@@ -96,10 +103,9 @@ def loadImageToLabel(entry, canvas, callback):
         canvas.image = photo
         callback()
 
-def performAction():
-    print("Both images have been selected. Performing action...")
 
-def setupUI(root):
+
+def setupUI(root: tk.Tk):
     menu = tk.Menu(root)
     root.config(menu=menu)
     
@@ -127,9 +133,27 @@ def setupUI(root):
     styleImageLabel = tk.Label(displayFrame, text="Style Image")
     styleImageLabel.pack(side=tk.LEFT, padx=10)
     
+    
+    
+    def run(input, style):
+        print("Both images have been selected. Performing neural Transfer...")
+        print(f"Input: {input}")
+        print(f"Style: {style}")
+        contentImage = loadImage(input, device)
+        styleImage = loadImage(style, device)
+        outputImage = contentImage.clone().requires_grad_(True)
+        
+        
+        
+        # Run neuralTransfer in a separate thread
+        transfer_thread = threading.Thread(target=neuralTransfer, args=(contentImage, styleImage, outputImage))
+        transfer_thread.start()
+        
+        
+    
     def onInputAndStyle():
         if inputEntry.get() and styleEntry.get():
-            performAction()
+            run(inputEntry.get(), styleEntry.get())
     
     # Input file selection
     tk.Label(inputFrame, text="Input Image:").pack(side=tk.LEFT)
@@ -163,14 +187,44 @@ def setupUI(root):
         
         outputImageLabels.append(outputImageLabel)
         outputImageCanvases.append(outputImageCanvas)
+    
+    
     # Display large output image
     largeOutputImageLabel = tk.Label(outputFrame, text="Large Output Image")
     largeOutputImageLabel.grid(row=6, column=0, columnspan=4, padx=10, pady=5)
     largeOutputImageCanvas = tk.Canvas(outputFrame, width=250, height=250)
     largeOutputImageCanvas.grid(row=7, column=0, columnspan=4, padx=10, pady=5)
     
+    def updateImages():
+        image_path = sourcePath.joinpath("data/output/gen_latest.png")
+        if image_path.exists():
+            image = Image.open(image_path)
+            image.thumbnail((250, 250))
+            photo = ImageTk.PhotoImage(image)
+            largeOutputImageCanvas.create_image(0, 0, anchor=tk.NW, image=photo)
+            largeOutputImageCanvas.image = photo
+            
+            
+            for i in range(len(outputImageCanvases)):
+                image_path = sourcePath.joinpath(f"data/output/gen_{i*50}.png")
+                if image_path.exists():
+                    image = Image.open(image_path)
+                    image.thumbnail((50, 50))
+                    photo = ImageTk.PhotoImage(image)
+                    outputImageCanvases[i].create_image(0, 0, anchor=tk.NW, image=photo)
+                    outputImageCanvases[i].image = photo
+        
+        
+            
+        root.after(10000, updateImages)  # run every 10 seconds
+    
+    updateImages()  # Initial call to start the loop
+    
+    def openOutputFolder():
+        subprocess.Popen(r'explorer /select,' + str(outputPath.joinpath("gen_latest.png")))
+    
     # Open output button
-    openOutputButton = tk.Button(root, text="Open Output", command=lambda: print("Open Output"))
+    openOutputButton = tk.Button(root, text="Open Output", command=openOutputFolder)
     openOutputButton.pack(side=tk.TOP, pady=10)
     
     return inputEntry, styleEntry, outputImage, outputImageCanvases
