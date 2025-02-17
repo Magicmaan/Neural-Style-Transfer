@@ -62,3 +62,5 @@ Follow the instructions in the project documentation to run the neural style tra
 - [Neural Style Transfer by Octaves0911](https://github.com/Octaves0911/Neural_Style_Transfer)
 - [Neural Style Transfer by nazianafis](https://github.com/nazianafis/Neural-Style-Transfer?tab=readme-ov-file)
 - [Neural Style Transfer Papers by ycjing](https://github.com/ycjing/Neural-Style-Transfer-Papers?tab=readme-ov-file)
+
+- [Styles Images](https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time?resource=download)

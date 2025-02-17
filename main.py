@@ -33,6 +33,8 @@ stylePath: Path = sourcePath.joinpath("data/style")
 inputList: list[str] = list(inputPath.glob('**/*.[jp][pn]g'))
 styleList: list[str] = list(stylePath.glob('**/*.[jp][pn]g'))
 
+print(styleList)
+
 # Loading the original and the style image
 contentImage = loadImage(inputList[2], device)
 styleImage = loadImage(styleList[2], device)
@@ -40,7 +42,7 @@ outputImage = contentImage.clone().requires_grad_(True)
 
 def neuralTransfer(contentImage, styleImage, outputImage):
     # Model hyperparameters
-    iterations = 1000
+    iterations = 1001  # number of iterations
     # learning rate, how similar the content and style should be. 
     # higher = more style, lower = more content
     lr = 0.05
