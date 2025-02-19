@@ -16,7 +16,7 @@ Follow these steps to set up the project:
 ### 1. Clone the repository
 
 ```sh
-git clone https://github.com/yourusername/Neural-Style-Transfer.git
+git clone https://github.com/magicmaan/Neural-Style-Transfer.git
 cd Neural-Style-Transfer
 ```
 
@@ -51,16 +51,9 @@ pip install -r requirements.txt
 
 Follow the instructions in the project documentation to run the neural style transfer.
 
-## Usage
-
-// ...existing code...
-
-### Sources
-
-- Tan, Wei Ren, Chan, Chee Seng, Aguirre, Hernan, and Tanaka, Kiyoshi. "Improved ArtGAN for Conditional Synthesis of Natural Image and Artwork." IEEE Transactions on Image Processing, vol. 28, no. 1, 2019, pp. 394-409. [https://doi.org/10.1109/TIP.2018.2866698](https://doi.org/10.1109/TIP.2018.2866698)
+### References
 
 - [Neural Style Transfer by Octaves0911](https://github.com/Octaves0911/Neural_Style_Transfer)
 - [Neural Style Transfer by nazianafis](https://github.com/nazianafis/Neural-Style-Transfer?tab=readme-ov-file)
 - [Neural Style Transfer Papers by ycjing](https://github.com/ycjing/Neural-Style-Transfer-Papers?tab=readme-ov-file)
-
 - [Styles Images](https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time?resource=download)
